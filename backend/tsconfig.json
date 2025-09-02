@@ -1,0 +1,61 @@
+// {
+// 	"compilerOptions": {
+// 		/* Base Options: */
+// 		"esModuleInterop": true,
+// 		"skipLibCheck": true,
+// 		"target": "es2022",
+// 		"verbatimModuleSyntax": false,
+// 		"allowJs": true,
+// 		"resolveJsonModule": true,
+// 		"moduleDetection": "force",
+// 		/* Strictness */
+// 		"noImplicitAny": false,
+// 		"noImplicitThis": true,
+// 		"strictNullChecks": true,
+// 		"strict": true,
+// 		"noUncheckedIndexedAccess": true,
+// 		/* If NOT transpiling with TypeScript: */
+// 		// "moduleResolution": "Bundler", // comment if you are want to seed data
+// 		// "module": "es2022", // comment if you are want to seed data
+// 		"module": "commonjs", // Uncomment if you are want to seed data
+// 		"noEmit": true,
+// 		"lib": ["es2022"],
+// 		"types": [
+// 			"./worker-configuration.d.ts",
+// 			"@types/node",
+// 			"@types/service-worker-mock"
+// 		]
+// 	},
+// 	"exclude": ["node_modules", "dist", "tests"],
+// 	"include": ["src", "worker-configuration.d.ts"]
+// }
+{
+	"compilerOptions": {
+		/* Base Options: */
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"target": "es2022",
+		"verbatimModuleSyntax": false,
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"moduleDetection": "force",
+		/* Strictness */
+		"noImplicitAny": false,
+		"noImplicitThis": true,
+		"strictNullChecks": true,
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		/* Node.js Configuration (updated from Cloudflare Workers) */
+		"moduleResolution": "node",
+		"module": "commonjs",
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"noEmit": false,
+		"lib": ["es2022"],
+		"types": [
+			"@types/node"
+		]
+	},
+	"exclude": ["node_modules", "dist", "tests"],
+	"include": ["src/**/*"]
+}

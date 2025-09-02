@@ -1,0 +1,50 @@
+{
+  "name": "cloudflare-workers-openapi",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "dev:http": "ts-node src/index-http.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:http": "node dist/index-http.js",
+    "clean": "rm -rf dist",
+    "postinstall": "prisma generate",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:reset": "prisma migrate reset --force",
+    "prisma:push": "prisma db push",
+    "db:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "dependencies": {
+    "@deepgram/sdk": "^4.11.1",
+    "@hono/node-server": "^1.18.0",
+    "@prisma/client": "^6.12.0",
+    "@prisma/extension-accelerate": "^2.0.2",
+    "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
+    "chanfana": "^2.6.3",
+    "dotenv": "^17.2.1",
+    "hono": "^4.6.20",
+    "jose": "^6.0.12",
+    "libphonenumber-js": "^1.12.10",
+    "mime": "^4.0.7",
+    "node-cron": "^3.0.3",
+    "ws": "^8.18.3",
+    "xlsx": "^0.18.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.0",
+    "@types/service-worker-mock": "^2.0.4",
+    "@types/ws": "^8.18.1",
+    "prisma": "^6.14.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
