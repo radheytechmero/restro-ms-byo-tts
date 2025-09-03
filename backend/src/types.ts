@@ -102,6 +102,11 @@ export const createMenuItemSchema = z.object({
   name: z.string().min(1, "Item name is required").max(255),
   description: z.string().optional(),
   price: z.number().positive("Price must be positive").multipleOf(0.01),
+  servesPeople: z.string().optional().nullable(),
+  ingredients: z.string().optional().nullable(),
+  spiceLevel: z.string().optional().nullable(),
+  allergens: z.string().optional().nullable(),
+  similarItems: z.string().optional().nullable(),
   imageUrl: z.string().url().optional().or(z.literal("")),
   isAvailable: z.boolean().default(true).optional(),
 });

@@ -304,7 +304,7 @@ const MenuItemsPage = () => {
                 <DialogTitle>Add Menu Item</DialogTitle>
                 <DialogDescription>Fill in the details below to add a new item</DialogDescription>
               </DialogHeader>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2">
                                  <div className="space-y-2">
                    <Label htmlFor="name">Name *</Label>
                    <Input
@@ -423,7 +423,7 @@ const MenuItemsPage = () => {
                  <DialogDescription>Update the details below</DialogDescription>
                </DialogHeader>
                {editingItem && (
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2">
                    <div className="space-y-2">
                      <Label htmlFor="edit-name">Name *</Label>
                      <Input
