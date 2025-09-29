@@ -18,7 +18,7 @@ export const customerCron = async (
       ? `?filter=customerSince>${new Date(lastCustomer.createdAt).getTime()}&expand=emailAddresses,phoneNumbers`
       : `?expand=emailAddresses,phoneNumbers`;
 
-    const url = `https://sandbox.dev.clover.com/v3/merchants/${merchantId}/customers${filterParam}`;
+    const url = `${process.env.CLOVER_BASE_URL}/merchants/${merchantId}/customers${filterParam}`;
 
     // Fetch customers from Clover
     const { data } = await axios.get(url, {
@@ -50,7 +50,7 @@ export const customerCron = async (
     // Bulk insert customers
     await prisma.customer.createMany({
       data: payload,
-      skipDuplicates: true, // avoids inserting same customer twice
+      // skipDuplicates: true, // avoids inserting same customer twice
     });
 
     console.log(`${payload.length} new customers added (duplicates ignored).`);
@@ -71,7 +71,7 @@ export const menuCron = async (prisma, restaurantId , merchantId: string, token:
     const filterParam = lastMenu
       ? `?filter=modifiedTime>${new Date(lastMenu.createdAt).getTime()}`
       : "";
-    const url = `https://sandbox.dev.clover.com/v3/merchants/${merchantId}/items${filterParam}`;
+    const url = `${process.env.CLOVER_BASE_URL}/merchants/${merchantId}/items${filterParam}`;
 
     // Fetch menu items
     const { data } = await axios.get(url, {
