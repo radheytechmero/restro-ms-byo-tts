@@ -56,7 +56,8 @@ async function main() {
   await prisma.customer.create({
     data: {
       restaurantId: restaurant.id,
-      name: "PTM",
+      name: "Jaun",
+      customerUID: "AF7DD66544YVE",
       email: "test@gmail.com",
       phone: "19143407710",
       active: true,
