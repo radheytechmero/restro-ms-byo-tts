@@ -70,7 +70,7 @@ export class OrderCreate extends OpenAPIRoute {
                 })
                 if (!customer) {
 
-                        let cloverCustomer = await createCloverCustomer(restro.mid, restro.token, customerName, customerPhone)
+                        let cloverCustomer:any = await createCloverCustomer(restro.mid, restro.token, customerName, customerPhone)
 
                         // let phno:any = parsePhoneNumber(customerPhone, 'US')
                         const add = await prisma.customer.create({
@@ -147,9 +147,19 @@ export class OrderCreate extends OpenAPIRoute {
             // console.log(orderData,"Asd");
 
 
+            // Call Clover API first
+            const cloverResult = await createCloverOrder(restro?.mid, restro?.token, orderItems, customerUID);
+            if (!cloverResult?.success) {
+                return c.json({
+                    success: false,
+                    error: cloverResult?.error || 'Failed to place order with Clover'
+                }, 500);
+            }
+
+            // Only add order to DB if Clover API succeeded
             const order = await prisma.order.create({
                 data: orderData
-            })
+            });
 
             // Create order items with enhanced fields
             for (const element of orderItems) {
@@ -159,7 +169,7 @@ export class OrderCreate extends OpenAPIRoute {
                     quantity: element.quantity,
                     price: element.price,
                     notes: element.notes || null
-                }
+                };
 
                 // Add size if provided and not null
                 if (element.size && element.size !== null) {
@@ -173,16 +183,13 @@ export class OrderCreate extends OpenAPIRoute {
 
                 await prisma.orderItem.create({
                     data: orderItemData
-                })
+                });
             }
 
-            console.log(body,"Asd");
-            
-            createCloverOrder(restro?.mid,restro?.token, orderItems, customerUID)
-            // return the new task
             return c.json({
                 success: true,
-                data: order
+                data: order,
+                clover: cloverResult
             });
         } catch (error: unknown) {
             console.error("Create restaurant error:", error);
