@@ -93,8 +93,9 @@ const MenuItemsPage = () => {
   const loadCategories = async () => {
     try {
       setIsCategoriesLoading(true);
-      const categoriesData = await apiService.getCategories();
       
+      const categoriesData = await apiService.getCategories(restaurantId);
+      console.log('Fetched categories data:', categoriesData);
       // Handle different response formats
       let categoriesArray: any[] = [];
       if (categoriesData && typeof categoriesData === 'object' && 'data' in categoriesData) {
@@ -485,7 +486,7 @@ const MenuItemsPage = () => {
                          <SelectItem value="extra-hot">Extra Hot</SelectItem>
                        </SelectContent>
                      </Select>
-                   </div>
+                   </div> 
 
                    <div className="space-y-2 md:col-span-2">
                      <Label htmlFor="edit-description">Description</Label>

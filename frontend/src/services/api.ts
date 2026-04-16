@@ -126,10 +126,7 @@ class ApiService {
 
   constructor() {
     this.axiosInstance = axios.create({
-      // baseURL: 'http://192.168.0.135:8787/api',
-      // baseURL: 'https://q6f1bmhp-3000.inc1.devtunnels.ms/api',
-      baseURL: '/api',
-      // baseURL: 'http://127.0.0.1:5002/api',
+      baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
       headers: {
         'Content-Type': 'application/json'
       }
@@ -285,8 +282,8 @@ class ApiService {
     await this.axiosInstance.delete(`/menu-items/${id}`);
   }
 
-  async getCategories(): Promise<any[]> {
-    const { data } = await this.axiosInstance.get(`/category`);
+  async getCategories(restaurantId:string): Promise<any[]> {
+    const { data } = await this.axiosInstance.get(`/category?`);
     return data;
   }
 

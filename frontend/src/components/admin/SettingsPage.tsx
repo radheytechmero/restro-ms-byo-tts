@@ -35,7 +35,17 @@ const SettingsPage = () => {
     email: null,
     opening_hours: null,
     active: true,
-    status: "active"
+    status: "active",
+    stt_model: 'deepgram',
+    stt_deepgram_language: 'en',
+    stt_deepgram_voice: 'aura',
+    stt_elevenlabs_api_key: '',
+    stt_elevenlabs_voice_id: '',
+    stt_elevenlabs_model_id: '',
+    stt_openai_base_url: '',
+    stt_openai_api_key: '',
+    stt_openai_model: 'tts-1',
+    stt_openai_voice: 'alloy'
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +84,10 @@ const SettingsPage = () => {
   const handleSaveSettings = async () => {
     try {
       setIsSaving(true);
-      
+      const cleanedRestuarant = Object.fromEntries(
+  Object.entries(restaurant).filter(([_, v]) => v != null)
+);
+      console.log('Saving restaurant settings:', cleanedRestuarant);     
       if (!restaurant.id) {
         toast({
           title: "Error",
@@ -84,7 +97,7 @@ const SettingsPage = () => {
         return;
       }
 
-      await apiService.updateRestaurant(restaurant.id, restaurant);
+      await apiService.updateRestaurant(restaurant.id, cleanedRestuarant);
       
       toast({
         title: "Restaurant Settings Saved",
@@ -117,15 +130,23 @@ const SettingsPage = () => {
         
         <Button 
           onClick={handleSaveSettings}
-          disabled={isSaving}
+          disabled={isSaving || isLoading}
           className="bg-gradient-to-r from-primary to-primary-glow"
         >
           <Save className="w-4 h-4 mr-2" />
-          {isSaving ? 'Saving...' : 'Save Changes'}
+          {isSaving ? 'Saving...' : isLoading ? 'Loading...' : 'Save Changes'}
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      )}
+
+      {!isLoading && (
+        <>
+          <div className="grid gap-6 lg:grid-cols-2">
         {/* General Settings */}
         <Card>
           <CardHeader>
@@ -259,6 +280,152 @@ const SettingsPage = () => {
         </Card>
 
       </div>
+
+      {/* AI Speech Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <SettingsIcon className="w-5 h-5" />
+            <span>AI Speech Settings</span>
+          </CardTitle>
+          <CardDescription>
+            Configure speech-to-text models and settings
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>STT Model</Label>
+            <select
+              value={restaurant.stt_model || 'deepgram'}
+              onChange={(e) => handleInputChange('stt_model', e.target.value)}
+              className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+            >
+              <option value="deepgram">Deepgram</option>
+              <option value="elevenlabs">Eleven Labs</option>
+              <option value="openai">OpenAI</option>
+            </select>
+          </div>
+
+          {restaurant.stt_model === 'deepgram' && (
+            <>
+              <div className="space-y-2">
+                <Label>Language</Label>
+                <select
+                  value={restaurant.stt_deepgram_language || 'en'}
+                  onChange={(e) => handleInputChange('stt_deepgram_language', e.target.value)}
+                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                >
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="de">German</option>
+                  <option value="fr">French</option>
+                  <option value="nl">Dutch</option>
+                  <option value="it">Italian</option>
+                  <option value="ja">Japanese</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Voice</Label>
+                <select
+                  value={restaurant.stt_deepgram_voice || 'aura'}
+                  onChange={(e) => handleInputChange('stt_deepgram_voice', e.target.value)}
+                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                >
+                  <option value="aura">Aura Default</option>
+                  <option value="aura-bright">Aura Bright</option>
+                  <option value="aura-warm">Aura Warm</option>
+                  <option value="aura-clear">Aura Clear</option>
+                  <option value="aura-deep">Aura Deep</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          {restaurant.stt_model === 'elevenlabs' && (
+            <>
+              <div className="space-y-2">
+                <Label>API Key</Label>
+                <Input
+                  type="password"
+                  value={restaurant.stt_elevenlabs_api_key || ''}
+                  onChange={(e) => handleInputChange('stt_elevenlabs_api_key', e.target.value)}
+                  placeholder="Eleven Labs API Key"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Voice ID</Label>
+                <Input
+                  type="text"
+                  value={restaurant.stt_elevenlabs_voice_id || ''}
+                  onChange={(e) => handleInputChange('stt_elevenlabs_voice_id', e.target.value)}
+                  placeholder="Voice ID"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="elevenlabsModelId">Model ID</Label>
+                <Input
+                  id="elevenlabsModelId"
+                  type="text"
+                  value={restaurant.stt_elevenlabs_model_id || ''}
+                  onChange={(e) => handleInputChange('stt_elevenlabs_model_id', e.target.value)}
+                  placeholder="e.g. eleven_turbo_v2_5"
+                />
+              </div>
+            </>
+          )}
+
+          {restaurant.stt_model === 'openai' && (
+            <>
+              <div className="space-y-2">
+                <Label>Base URL</Label>
+                <Input
+                  type="text"
+                  value={restaurant.stt_openai_base_url || ''}
+                  onChange={(e) => handleInputChange('stt_openai_base_url', e.target.value)}
+                  placeholder="https://api.openai.com/v1"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>API Key</Label>
+                <Input
+                  type="password"
+                  value={restaurant.stt_openai_api_key || ''}
+                  onChange={(e) => handleInputChange('stt_openai_api_key', e.target.value)}
+                  placeholder="OpenAI API Key"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Model</Label>
+                <select
+                  value={restaurant.stt_openai_model || 'tts-1'}
+                  onChange={(e) => handleInputChange('stt_openai_model', e.target.value)}
+                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                >
+                  <option value="tts-1">TTS-1</option>
+                  <option value="tts-1-hd">TTS-1-HD</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Voice</Label>
+                <select
+                  value={restaurant.stt_openai_voice || 'alloy'}
+                  onChange={(e) => handleInputChange('stt_openai_voice', e.target.value)}
+                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+                >
+                  <option value="alloy">Alloy</option>
+                  <option value="echo">Echo</option>
+                  <option value="fable">Fable</option>
+                  <option value="onyx">Onyx</option>
+                  <option value="nova">Nova</option>
+                  <option value="shimmer">Shimmer</option>
+                </select>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+        </>
+      )}
 
     </div>
   );

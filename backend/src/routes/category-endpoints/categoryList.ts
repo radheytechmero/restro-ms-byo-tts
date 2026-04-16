@@ -43,21 +43,21 @@ export class CategoryList extends OpenAPIRoute {
 		const prisma = c.get('prisma')
 		const { query } = await this.getValidatedData<typeof this.schema>();
 		const authenticatedRestaurantId = c.get('authenticatedRestaurantId') as number
-		
 		try {
 			// Always filter by the authenticated restaurant
 			const categories = await prisma.category.findMany({
 				where: { restaurantId: authenticatedRestaurantId },
 				orderBy: { displayOrder: 'asc' },
 			});
+			console.log(`Fetched ${categories.length} categories for restaurant ID ${authenticatedRestaurantId}`);
 
 			return c.json({
 				success: true,
 				data: categories,
-			});
+			});	
 		} catch (err) {
 			console.error("Error fetching categories:", err)
-
+			
 			return c.json(
 				{
 					error: 'Failed to fetch categories',

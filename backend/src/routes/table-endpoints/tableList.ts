@@ -33,6 +33,7 @@ export class TableList extends OpenAPIRoute {
 		try {
 			const tables = await prisma.table.findMany({
 				where: { restaurantId: authenticatedRestaurantId },
+		
 				orderBy: { tableNumber: 'asc' },
 			});
 

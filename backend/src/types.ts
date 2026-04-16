@@ -41,6 +41,16 @@ export const createRestaurantSchema = z.object({
   opening_hours: z.string().optional(),
   active: z.boolean().default(true).optional(),
   status: statusSchema.optional(),
+  stt_model: z.enum(['deepgram', 'elevenlabs', 'openai']).optional(),
+  stt_deepgram_language: z.enum(['en', 'es', 'fr', 'de', 'nl', 'it', 'ja']).optional(),
+  stt_deepgram_voice: z.string().optional(),
+  stt_elevenlabs_api_key: z.string().optional(),
+  stt_elevenlabs_voice_id: z.string().optional(),
+  stt_elevenlabs_model_id: z.string().optional(),
+  stt_openai_base_url: z.string().optional(),
+  stt_openai_api_key: z.string().optional(),
+  stt_openai_model: z.string().optional(),
+  stt_openai_voice: z.string().optional(),
 });
 
 export const updateRestaurantSchema = createRestaurantSchema.partial();

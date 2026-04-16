@@ -42,7 +42,7 @@ export class CronUpdate extends OpenAPIRoute {
         const req = c.req;
         const cronKey = req.header("x-cron-key");
         const expectedKey = process.env.CRON_SECRET_KEY || "local-cron-key";
-
+        
         if (!cronKey || cronKey !== expectedKey) {
             return c.json({ success: false }, 401);
         }

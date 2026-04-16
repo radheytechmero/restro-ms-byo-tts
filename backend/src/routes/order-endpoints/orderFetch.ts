@@ -71,7 +71,7 @@ export class OrderFetch extends OpenAPIRoute {
         try {
             const authenticatedRestaurantId = c.get('authenticatedRestaurantId') as number
             
-            			const order = await prisma.order.findUnique({
+            const order = await prisma.order.findUnique({
 				where: { 
 					id,
 					restaurantId: authenticatedRestaurantId

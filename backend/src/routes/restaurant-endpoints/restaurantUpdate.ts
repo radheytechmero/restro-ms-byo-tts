@@ -1,5 +1,5 @@
 import { Num, OpenAPIRoute } from "chanfana";
-import { z } from "zod";
+import { boolean, z } from "zod";
 import { type AppContext } from "../../middleware/prisma-client";
 import { updateRestaurantSchema } from "../../types";
 
@@ -15,7 +15,7 @@ export class RestaurantUpdate extends OpenAPIRoute {
                         schema: updateRestaurantSchema,
                     },
                 },
-            },
+            },  
             params: z.object({
                 id: Num(),
             }),
@@ -42,13 +42,14 @@ export class RestaurantUpdate extends OpenAPIRoute {
 
         const { body, params } = await this.getValidatedData<typeof this.schema>();
         const { id } = params;
-
+        console.log(body)
         const prisma = c.get("prisma");
         try {
             // Try to find the restaurant first
             const restaurant = await prisma.restaurant.findUnique({
                 where: { id },
             });
+            console.log("Found restaurant:", restaurant);
 
             // If restaurant doesn't exist, return an error
             if (!restaurant) {

@@ -76,6 +76,8 @@ const RestaurantPage = () => {
         address: form.address,
         description: form.description,
         active: form.active,
+        password: '1234', // default password
+        location:"test"
       });
       toast({ title: 'Success', description: 'Restaurant created' });
       setIsCreateOpen(false);

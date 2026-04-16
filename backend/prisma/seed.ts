@@ -25,6 +25,9 @@ async function main() {
       password: hashedPassword,
       opening_hours: "10:00-22:00",
       active: true,
+      stt_model: 'deepgram',
+      stt_deepgram_language: 'en',
+      stt_deepgram_voice: 'aura',
     }
   });
 
@@ -37,6 +40,10 @@ async function main() {
       password: hashedPassword,
       opening_hours: "10:00-22:00",
       active: true,
+      stt_model: 'openai',
+      stt_openai_base_url: 'https://api.openai.com/v1',
+      stt_openai_model: 'tts-1',
+      stt_openai_voice: 'alloy',
     }
   });
 
@@ -50,6 +57,9 @@ async function main() {
       password: hashedPassword,
       opening_hours: "10:00-22:00",
       active: true,
+      stt_model: 'deepgram',
+      stt_deepgram_language: 'en',
+      stt_deepgram_voice: 'aura',
     }
   });
 
