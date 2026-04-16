@@ -24,7 +24,19 @@ app.use('*', cors({
 app.use('*', getPrisma);
 setUpOpenAPI(app);
 
-const port = 5002;
+const envPort = process.env.PORT;
+const isProduction = process.env.NODE_ENV === "production";
+
+if (isProduction && !envPort) {
+  throw new Error("PORT must be set in production");
+}
+
+const port = envPort ? Number(envPort) : 5002;
+
+if (!Number.isFinite(port) || port <= 0) {
+  throw new Error(`Invalid PORT value: ${envPort}`);
+}
+
 const reactBuildPath = join(process.cwd(), "../frontend/dist"); // path to your React build folder
 
 const listener = async (req: IncomingMessage, res: ServerResponse) => {
@@ -90,7 +102,7 @@ const cronKey = process.env.CRON_SECRET_KEY || 'local-cron-key';
 
 cron.schedule('* * * * *', async () => {
   try {
-    // Build local URL to call our cron endpoint. When running `dev:http`, it's http on port 5002
+    // Build local URL to call our cron endpoint using the active server port.
     const url = `http://localhost:${port}${globalConfig.baseURL}/cron/update`;
     console.log(`[cron] Triggering: ${url} at ${new Date().toISOString()}`);
     await axios.post(url, {}, { headers: { 'x-cron-key': cronKey } });

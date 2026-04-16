@@ -1,6 +1,12 @@
 import { MiddlewareHandler } from "hono";
+import { isPublicApiRoute } from "./public-routes";
 
 export const restaurantScopeMiddleware: MiddlewareHandler = async (c, next) => {
+    if (isPublicApiRoute(c.req.path)) {
+        await next();
+        return;
+    }
+
     const user = c.get("user");
     
     if (!user || !user.restaurantId) {

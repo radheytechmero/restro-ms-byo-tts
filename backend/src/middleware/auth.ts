@@ -1,7 +1,13 @@
 import { verifyJWT } from "../lib/jwt";
 import { MiddlewareHandler } from "hono";
+import { isPublicApiRoute } from "./public-routes";
 
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
+    if (isPublicApiRoute(c.req.path)) {
+        await next();
+        return;
+    }
+
     const authHeader = c.req.header("Authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

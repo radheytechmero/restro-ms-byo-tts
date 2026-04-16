@@ -43,6 +43,7 @@ import { RecordingList } from "./routes/recording-endpoints/recordingList";
 import { RecordingFetch } from "./routes/recording-endpoints/recordingFetch";
 import { RecordingCreate } from "./routes/recording-endpoints/recordingCreate";
 import { RestaurantFetchByPhone } from "./routes/restaurant-endpoints/restaurantFetchByPhone";
+import { HealthRoute } from "./routes/health-endpoints/health";
 
 
 export function setUpOpenAPI(app) {
@@ -79,6 +80,9 @@ export function setUpOpenAPI(app) {
 
     // Cron (no auth middleware; secured via header key)
     openapi.post(`${globalConfig.baseURL}/cron/update`, CronUpdate);
+
+    // Health check (no auth required)
+    openapi.get(`${globalConfig.baseURL}/health`, HealthRoute);
 
     // Menu Item OpenAPI endpoints
     openapi.get(`${globalConfig.baseURL}/menu-items`, MenuItemList);
