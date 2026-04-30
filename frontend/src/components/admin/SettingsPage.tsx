@@ -3,13 +3,14 @@
  * System configuration and admin settings
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { ThemeDemo } from '@/components/ui/theme-demo';
 import { 
   Settings as SettingsIcon,
@@ -19,10 +20,30 @@ import {
   Database,
   Save,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Play,
+  Square,
+  Volume2
 } from 'lucide-react';
 import { apiService } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
+
+const backgroundNoiseOptions = [
+  {
+    id: 'cafe-ambience',
+    name: 'Cafe Ambiant',
+    description: 'Light conversation bed for casual ordering calls.',
+    preview: 'Cafe ambience',
+    audioSrc: '/cafe-ambience.mp3'
+  },
+  {
+    id: 'restaurant-ambience',
+    name: 'Restaurant Ambiance',
+    description: 'Soft table chatter and room tone for a natural dining-room feel.',
+    preview: 'Restaurant ambience',
+    audioSrc: '/restaurant-ambience.mp3'
+  }
+];
 
 const SettingsPage = () => {
   const [restaurant, setRestaurant] = useState({
@@ -45,12 +66,29 @@ const SettingsPage = () => {
     stt_openai_base_url: '',
     stt_openai_api_key: '',
     stt_openai_model: 'tts-1',
-    stt_openai_voice: 'alloy'
+    stt_openai_voice: 'alloy',
+    background_noise_enabled: false,
+    background_noise_type: ''
   });
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [previewingNoise, setPreviewingNoise] = useState<string | null>(null);
+  const previewCleanupRef = useRef<(() => void) | null>(null);
   const { toast } = useToast();
+
+  const stopNoisePreview = () => {
+    previewCleanupRef.current?.();
+    previewCleanupRef.current = null;
+    setPreviewingNoise(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      previewCleanupRef.current?.();
+      previewCleanupRef.current = null;
+    };
+  }, []);
 
   const loadSettings = async () => {
     try {
@@ -117,6 +155,66 @@ const SettingsPage = () => {
 
   const handleInputChange = (key: string, value: string | number | boolean) => {
     setRestaurant(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleBackgroundNoiseToggle = (checked: boolean) => {
+    setRestaurant(prev => ({
+      ...prev,
+      background_noise_enabled: checked,
+      background_noise_type: checked ? prev.background_noise_type || backgroundNoiseOptions[0].id : ''
+    }));
+
+    if (!checked) {
+      stopNoisePreview();
+    }
+  };
+
+  const handleNoiseSelection = (noiseId: string) => {
+    handleInputChange('background_noise_type', noiseId);
+  };
+
+  const playNoisePreview = (noiseId: string) => {
+    if (previewingNoise === noiseId) {
+      stopNoisePreview();
+      return;
+    }
+
+    stopNoisePreview();
+
+    try {
+      const selectedNoise = backgroundNoiseOptions.find((noise) => noise.id === noiseId);
+
+      if (!selectedNoise) {
+        return;
+      }
+
+      const audio = new Audio(selectedNoise.audioSrc);
+      audio.loop = true;
+      audio.volume = 0.55;
+
+      audio.play().catch((error) => {
+        console.error('Error playing background noise preview:', error);
+        stopNoisePreview();
+        toast({
+          title: "Preview unavailable",
+          description: "Your browser blocked the audio preview. Please try again.",
+          variant: "destructive",
+        });
+      });
+
+      previewCleanupRef.current = () => {
+        audio.pause();
+        audio.currentTime = 0;
+      };
+      setPreviewingNoise(noiseId);
+    } catch (error) {
+      console.error('Error playing background noise preview:', error);
+      toast({
+        title: "Preview unavailable",
+        description: "Your browser blocked the audio preview. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -422,6 +520,84 @@ const SettingsPage = () => {
               </div>
             </>
           )}
+
+          <Separator />
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-0.5">
+                <Label>Background Noise</Label>
+                <p className="text-sm text-muted-foreground">Ask whether calls should include ambience behind the voice.</p>
+              </div>
+              <Switch
+                checked={restaurant.background_noise_enabled || false}
+                onCheckedChange={handleBackgroundNoiseToggle}
+              />
+            </div>
+
+            {restaurant.background_noise_enabled && (
+              <div className="grid gap-3 md:grid-cols-2">
+                {backgroundNoiseOptions.map((noise) => {
+                  const isSelected = restaurant.background_noise_type === noise.id;
+                  const isPreviewing = previewingNoise === noise.id;
+
+                  return (
+                    <div
+                      key={noise.id}
+                      onClick={() => handleNoiseSelection(noise.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          handleNoiseSelection(noise.id);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      className={`rounded-md border p-4 text-left transition-colors hover:bg-accent ${
+                        isSelected ? 'border-primary bg-primary/5' : 'border-border bg-background'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Volume2 className="h-4 w-4 text-primary" />
+                            <span className="font-medium">{noise.name}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{noise.description}</p>
+                        </div>
+                        {isSelected && <Badge variant="default">Selected</Badge>}
+                      </div>
+
+                      <div className="mt-4 flex items-center justify-between gap-3">
+                        <Badge variant="secondary">{noise.preview}</Badge>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            playNoisePreview(noise.id);
+                          }}
+                        >
+                          {isPreviewing ? (
+                            <>
+                              <Square className="h-4 w-4" />
+                              Stop
+                            </>
+                          ) : (
+                            <>
+                              <Play className="h-4 w-4" />
+                              Preview
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
         </>

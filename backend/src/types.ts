@@ -51,6 +51,8 @@ export const createRestaurantSchema = z.object({
   stt_openai_api_key: z.string().optional(),
   stt_openai_model: z.string().optional(),
   stt_openai_voice: z.string().optional(),
+  background_noise_enabled: z.boolean().optional(),
+  background_noise_type: z.string().optional().nullable(),
 });
 
 export const updateRestaurantSchema = createRestaurantSchema.partial();

@@ -3,7 +3,7 @@ import { getPrisma, Env } from "./middleware/prisma-client";
 import { setUpOpenAPI } from "./openapi";
 import { cors } from 'hono/cors';
 import { readFileSync } from 'fs';
-import { createServer } from 'https';
+import { createServer } from 'http';
 import 'dotenv/config';
 import { IncomingMessage, ServerResponse } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
@@ -19,24 +19,24 @@ app.use('*', cors({
 app.use('*', getPrisma);
 setUpOpenAPI(app);
 
-const port = 443;
+const port = process.env.PORT;
 
-let options;
-try {
-  options = {
-    cert: readFileSync('./src/cert/cert.pem'),
-    key: readFileSync('./src/cert/key.pem'),
-  };
-  console.log('✅ SSL certificates loaded successfully');
-} catch (error) {
-  console.warn('⚠️ SSL certificates not found. Creating self-signed certificates for testing...');
-  // For development/testing, you can create self-signed certificates
-  // or use HTTP instead of HTTPS
-  console.log('Please add your SSL certificates to src/cert/cert.pem and src/cert/key.pem');
-  console.log('For testing, you can create self-signed certificates using:');
-  console.log('openssl req -x509 -newkey rsa:4096 -keyout src/cert/key.pem -out src/cert/cert.pem -days 365 -nodes');
-  process.exit(1);
-}
+// let options;
+// try {
+//   options = {
+//     cert: readFileSync('./src/cert/cert.pem'),
+//     key: readFileSync('./src/cert/key.pem'),
+//   };
+//   console.log('✅ SSL certificates loaded successfully');
+// } catch (error) {
+//   console.warn('⚠️ SSL certificates not found. Creating self-signed certificates for testing...');
+//   // For development/testing, you can create self-signed certificates
+//   // or use HTTP instead of HTTPS
+//   console.log('Please add your SSL certificates to src/cert/cert.pem and src/cert/key.pem');
+//   console.log('For testing, you can create self-signed certificates using:');
+//   console.log('openssl req -x509 -newkey rsa:4096 -keyout src/cert/key.pem -out src/cert/cert.pem -days 365 -nodes');
+//   process.exit(1);
+// }
 
 const listener = async (req: IncomingMessage, res: ServerResponse) => {
   const { method, headers, url } = req;
@@ -68,9 +68,7 @@ const listener = async (req: IncomingMessage, res: ServerResponse) => {
 };
 
 
-let server = createServer(options, listener)
-
-
+let server = createServer( listener)
 
 server.listen(port, () => {
   console.log(`🚀 HTTPS server running at https://localhost:${port}`);

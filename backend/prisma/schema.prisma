@@ -52,6 +52,8 @@ model Restaurant {
   stt_openai_api_key      String?
   stt_openai_model        String?   @default("tts-1")
   stt_openai_voice        String?   @default("alloy")
+  background_noise_enabled Boolean  @default(false)
+  background_noise_type    String?
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
 
